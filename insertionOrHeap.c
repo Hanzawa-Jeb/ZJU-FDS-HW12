@@ -74,6 +74,7 @@ void judgeType(int n, int * list) {
             i ++;
             heapSortOneStep(n, heapList, i);
             printSeq(heapList, n);
+            break;
         }
     }
 }
@@ -83,22 +84,22 @@ void initHeap(int n, int * list) {
     //the index start from 0, and it is a maxheap
     int lastNonLeaf = (n-2)/2;
     //index of the last non-leaf node
-    for (int i = lastNonLeaf; i > 0; i ++) {
-        percolateUp(list, n, i);
+    for (int i = lastNonLeaf; i >= 0; i ++) {
+        percolateDown(list, n, i);
     }
 }
 
 void insertionSortOneStep(int n, int * list, int sorted_length) {
-    int curr = list[sorted_length + 1];
-    for (int i = sorted_length + 1; i > 0; i --) {
-        if (curr > list[i-1]) {
-            list[i] = curr;
-            break;
-        } else {
-            list[i] = list[i-1];
-        }
+    int i = sorted_length + 1;
+    int curr = list[i];  
+
+    while (i > 0 && list[i - 1] > curr) {
+        list[i] = list[i - 1];
+        i--;
     }
+    list[i] = curr;
 }
+
 
 void heapSortOneStep(int n, int * list, int sorted_length) {
     int tempMax = list[0];

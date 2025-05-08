@@ -1,0 +1,136 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+void setList(int n, int * list);
+void judgeType(int n, int * list);
+void initHeap(int n, int * list);
+void insertionSortOneStep(int n, int * list, int sorted_length);
+void heapSortOneStep(int n, int * list, int sorted_length);
+bool identicalSeq(int * list1, int * list2, int len);
+void printSeq(int * list, int len);
+
+void percolateDown(int * list, int len, int index);
+void deleteMax(int * list, int len);
+void swap(int * list, int index1, int index2);
+
+int main()
+{
+    int num;
+    scanf("%d", &num);
+    int * list = (int *)calloc(num, sizeof(int));
+    setList(num, list);
+    judgeType(num, list);
+    free(list);
+    return 0;
+}
+
+void setList(int n, int * list) {
+    for (int i = 0; i < n; i ++) {
+        scanf("%d", &list[i]);
+    }
+}
+
+void judgeType(int n, int * list) {
+    int * insertionList = (int *)calloc(n, sizeof(int));
+    int * heapList = (int *)calloc(n, sizeof(int));
+    int * refList = (int *)calloc(n, sizeof(int));
+    memcpy(insertionList, list, n * sizeof(int));
+    memcpy(heapList, list, n * sizeof(int));
+    setList(n, refList);
+
+    initHeap(n, heapList);
+
+    for (int i = 0; i < n - 1; i ++) {
+        insertionSortOneStep(n, insertionList, i);
+        heapSortOneStep(n, heapList, i);
+
+        if (identicalSeq(refList, insertionList, n)) {
+            printf("Insertion Sort\n");
+            insertionSortOneStep(n, insertionList, i + 1);
+            printSeq(insertionList, n);
+            goto END;
+        } else if (identicalSeq(refList, heapList, n)) {
+            printf("Heap Sort\n");
+            heapSortOneStep(n, heapList, i + 1);
+            printSeq(heapList, n);
+            goto END;
+        }
+    }
+
+END:
+    free(insertionList);
+    free(heapList);
+    free(refList);
+}
+
+void initHeap(int n, int * list) {
+    int lastNonLeaf = (n - 2) / 2;
+    for (int i = lastNonLeaf; i >= 0; i --) {
+        percolateDown(list, n, i);
+    }
+}
+
+void insertionSortOneStep(int n, int * list, int sorted_length) {
+    int i = sorted_length + 1;
+    if (i >= n) return;
+
+    int curr = list[i];
+    while (i > 0 && list[i - 1] > curr) {
+        list[i] = list[i - 1];
+        i--;
+    }
+    list[i] = curr;
+}
+
+void heapSortOneStep(int n, int * list, int sorted_length) {
+    int heapSize = n - sorted_length;
+    if (heapSize <= 1) return;
+
+    int tempMax = list[0];
+    deleteMax(list, heapSize);
+    list[heapSize - 1] = tempMax;
+}
+
+bool identicalSeq(int * list1, int * list2, int len) {
+    for (int i = 0; i < len; i ++) {
+        if (list1[i] != list2[i]) return false;
+    }
+    return true;
+}
+
+void printSeq(int * list, int len) {
+    for (int i = 0; i < len; i ++) {
+        printf("%d", list[i]);
+        if (i != len - 1) printf(" ");
+    }
+    printf("\n");
+}
+
+void percolateDown(int * list, int len, int index) {
+    while (2 * index + 1 < len) {
+        int left = 2 * index + 1;
+        int right = 2 * index + 2;
+        int largest = index;
+
+        if (left < len && list[left] > list[largest]) largest = left;
+        if (right < len && list[right] > list[largest]) largest = right;
+
+        if (largest == index) break;
+        swap(list, index, largest);
+        index = largest;
+    }
+}
+
+void deleteMax(int * list, int len) {
+    if (len <= 1) return;
+    list[0] = list[len - 1];
+    percolateDown(list, len - 1, 0);
+}
+
+void swap(int * list, int index1, int index2) {
+    int temp = list[index1];
+    list[index1] = list[index2];
+    list[index2] = temp;
+}

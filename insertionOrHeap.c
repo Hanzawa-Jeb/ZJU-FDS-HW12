@@ -55,7 +55,7 @@ void judgeType(int n, int * list) {
     //used to get the input of the reference list
     initHeap(n, heapList);
     //initialize the heap
-    for (int i = 0; i < n; i ++) {
+    for (int i = 0; i < n - 1; i++) {
         //inside the loop, we judge each step.
         insertionSortOneStep(n, insertionList, i);
         heapSortOneStep(n, heapList, i);
@@ -103,6 +103,7 @@ void insertionSortOneStep(int n, int * list, int sorted_length) {
 
 void heapSortOneStep(int n, int * list, int sorted_length) {
     int tempMax = list[0];
+    if (n - sorted_length <= 1) return ;
     deleteMax(list, n-sorted_length);
     //delete the maximum element
     list[n-sorted_length-1] = tempMax;
@@ -144,33 +145,20 @@ void percolateUp(int * list, int len, int index) {
 }
 
 void percolateDown(int * list, int len, int index) {
-    int tempVal;
-    int leftChildInd, rightChildInd;
-    while (index < len) {
-        leftChildInd = 2 * index + 1;
-        rightChildInd = 2 * index + 2;
-        if (leftChildInd < len && rightChildInd < len) {
-            if (list[leftChildInd] > list[rightChildInd]) {
-                if (list[leftChildInd] > list[index]) {
-                    swap(list, leftChildInd, index);
-                    index = leftChildInd;
-                }
-            } else {
-                if (list[rightChildInd] > list[index]) {
-                    swap(list, rightChildInd, index);
-                    index = rightChildInd;
-                }
-            }
-        } else if (leftChildInd < len) {
-            if (list[leftChildInd] > list[index]) {
-                swap(list, leftChildInd, index);
-                index = leftChildInd;
-            }
-        } else {
-            break;
-        }
+    while (2 * index + 1 < len) {
+        int left = 2 * index + 1;
+        int right = 2 * index + 2;
+        int largest = index;
+
+        if (left < len && list[left] > list[largest]) largest = left;
+        if (right < len && list[right] > list[largest]) largest = right;
+
+        if (largest == index) break;
+        swap(list, index, largest);
+        index = largest;
     }
 }
+
 
 void deleteMax(int * list, int len) {
     list[0] = list[len - 1];
